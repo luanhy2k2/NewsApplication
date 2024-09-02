@@ -6,7 +6,5 @@ export class BaseOrmEntity{
     @Column()
     createdAt:Date;
     @Column()
-    updateAt:Date;
-    @Column()
-    updateBy:string
+    updateAt:Date; 
 }

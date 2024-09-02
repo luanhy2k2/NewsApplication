@@ -5,4 +5,6 @@ import { BaseOrmEntity } from "../common/baseOrmEntity";
 export class Category extends BaseOrmEntity{
     @Column()
     name:string
+    @Column()
+    updateBy:string
 }
