@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
-import { BaseOrmEntity } from '../common/baseOrmEntity';
+import { BaseOrmEntity } from '../common/baseOrmEntity.common';
 import { Article } from './articel.entity';
 import { Tag } from './tag.entity';
 

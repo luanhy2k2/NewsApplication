@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseOrmEntity } from "../common/baseOrmEntity";
+import { BaseOrmEntity } from "../common/baseOrmEntity.common";
 import { Article } from "./articel.entity";
 
 @Entity('FilePost')

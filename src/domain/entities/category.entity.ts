@@ -1,6 +1,5 @@
 import { Column, Entity } from "typeorm";
-import { BaseEntity } from "../common/baseEntity";
-import { BaseOrmEntity } from "../common/baseOrmEntity";
+import { BaseOrmEntity } from "../common/baseOrmEntity.common";
 @Entity('Category')
 export class Category extends BaseOrmEntity{
     @Column()

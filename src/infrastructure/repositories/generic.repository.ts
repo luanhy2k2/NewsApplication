@@ -1,9 +1,5 @@
-import { Repository, SelectQueryBuilder, Like, EntityTarget, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, SelectQueryBuilder, FindOptionsOrder, FindOptionsWhere, DeleteResult, UpdateResult } from 'typeorm';
 import { IGenericRepository } from 'src/domain/repositories/generic.repository.interface';
-import { BaseCommandResponse } from 'src/domain/common/baseCommandResponse';
-import { BaseQuerieResponse } from 'src/domain/common/baseQuerieResponse';
-
 
 export class GenericRepository<T> implements IGenericRepository<T> {
     constructor(
@@ -14,23 +10,37 @@ export class GenericRepository<T> implements IGenericRepository<T> {
         return this.repository.createQueryBuilder('entity');
     }
 
-    async add(entity: T): Promise<BaseCommandResponse<T>> {
-        const entityInstance = this.repository.create(entity);
-        await this.repository.save(entityInstance);
-        return new BaseCommandResponse<T>(true, "Thêm dữ liệu thành công", entity);
+    async add(entity: T): Promise<T> {
+        try {
+            const entityInstance = this.repository.create(entity);
+            const savedEntity = await this.repository.save(entityInstance);
+            return savedEntity;
+        } catch (error) {
+            console.error('Error adding entity:', error.message);
+            if (error.code === '23503') { 
+                throw new Error('Foreign key constraint violation.');
+            }
+            throw error;
+        }
     }
 
-    async edit(id: string, entity: Partial<T>): Promise<BaseCommandResponse<T>> {
-        await this.repository.update(id, entity as any);
-        const updatedEntity = await this.repository.findOne({
-            where: { id } as any // Có thể cần điều chỉnh cho đúng kiểu
-        });
-        return new BaseCommandResponse<T>(true, "Sửa thông tin thành công!", updatedEntity);
+    async edit(id: string, entity: T): Promise<UpdateResult> {
+        try{
+            const result = await this.repository.update(id, entity as any);
+            return result;
+        } catch(error){
+            console.error('error updating entity:', error.message)
+            if (error.code === '23503') { 
+                throw new Error('Foreign key constraint violation.');
+            }
+            throw error;
+        }
+        
     }
 
-    async deleteAsync(id: string): Promise<BaseCommandResponse<string>> {
-        await this.repository.delete(id);
-        return new BaseCommandResponse<string>(true, "Xoá thông tin thành công!", id);
+    async deleteAsync(id: string): Promise<DeleteResult> {
+        const result = await this.repository.delete(id);
+        return result;
     }
 
     async findById(id: string): Promise<T> {
@@ -43,15 +53,14 @@ export class GenericRepository<T> implements IGenericRepository<T> {
     async get(pageIndex: number, pageSize: number, 
         condition: FindOptionsWhere<T>,
         order: FindOptionsOrder<T> = {}
-    ): Promise<BaseQuerieResponse<T>> {
-        // const condition = whereCondition({} as T);
+    ):Promise<[T[], number]> {
         const [result, total] = await this.repository.findAndCount({
             skip: (pageIndex - 1) * pageSize,
             take: pageSize,
             where: condition,
             order
         });
-        return new BaseQuerieResponse<T>(pageIndex, pageSize, result, total, "");
+        return [result,total];
     }
     
 }

@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseOrmEntity } from "../common/baseOrmEntity";
+import { BaseOrmEntity } from "../common/baseOrmEntity.common";
 import { Account } from "./account.entity";
 import { Category } from "./category.entity";
 import { AppProvalStatus } from "../common/appProval.common";
